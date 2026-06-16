@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>攝影作品集</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a1a'/%3E%3Ccircle cx='50' cy='52' r='20' fill='none' stroke='%23faf9f7' stroke-width='5'/%3E%3Ccircle cx='50' cy='52' r='8' fill='%23faf9f7'/%3E%3Crect x='30' y='28' width='40' height='10' rx='3' fill='%23faf9f7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf9f7; --surface:#ffffff; --ink:#1a1a1a; --ink-soft:#5b5b58;
+    --line:#e7e3dc; --line-soft:#efece6; --accent:#1a1a1a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .serif{font-family:'Playfair Display',serif}
+  img{display:block}
+  button{font-family:inherit}
+  ::selection{background:#e7dfd2}
+
+  /* ---------- nav ---------- */
+  header{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:rgba(250,249,247,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-soft)}
+  .brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;letter-spacing:.02em;cursor:pointer;background:none;border:0;color:var(--ink)}
+  nav ul{display:flex;gap:32px;list-style:none;align-items:center}
+  nav a{text-decoration:none;color:var(--ink-soft);font-size:13px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;transition:color .3s}
+  nav a:hover{color:var(--ink)}
+  .nav-right{display:flex;align-items:center;gap:18px}
+  .edit-toggle{display:none;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);background:none;border:1px solid var(--line);border-radius:999px;padding:7px 16px;cursor:pointer;transition:.25s}
+  body.owner .edit-toggle{display:inline-block}
+  .edit-toggle:hover{border-color:var(--ink);color:var(--ink)}
+  body.editing .edit-toggle{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .menu-btn{display:none;background:none;border:0;font-size:22px;cursor:pointer;color:var(--ink)}
+
+  /* ---------- editor toolbar ---------- */
+  #editorbar{display:none;gap:10px;flex-wrap:wrap;align-items:center;max-width:1180px;margin:0 auto;padding:16px 48px 0}
+  body.editing #editorbar{display:flex}
+  .ebtn{font-size:13px;font-weight:500;padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:7px}
+  .ebtn:hover{border-color:var(--ink)}
+  .ebtn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .ebtn svg{width:15px;height:15px}
+  .ebar-hint{font-size:12px;color:var(--ink-soft);margin-left:auto;letter-spacing:.04em}
+
+  /* ---------- hero ---------- */
+  .hero{max-width:1180px;margin:0 auto;padding:84px 48px 56px;display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+  .hero.no-img{grid-template-columns:1fr;text-align:center;max-width:880px}
+  .hero .eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:24px}
+  .hero h1{font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(42px,6vw,80px);line-height:1.03;letter-spacing:-.01em;margin-bottom:24px}
+  .hero p{font-size:16px;color:var(--ink-soft);max-width:44ch;font-weight:300}
+  .hero.no-img p{margin-left:auto;margin-right:auto}
+  .hero-img{aspect-ratio:4/5;overflow:hidden;border-radius:2px;background:#eceae5}
+  .hero-img img{width:100%;height:100%;object-fit:cover}
+
+  /* ---------- filters ---------- */
+  .filters{max-width:1180px;margin:0 auto;padding:14px 48px 40px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line-soft)}
+  .chip{font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:9px 20px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink-soft);cursor:pointer;transition:.25s;white-space:nowrap}
+  .chip:hover{border-color:var(--ink);color:var(--ink)}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  /* ---------- gallery ---------- */
+  .gallery{max-width:1180px;margin:0 auto;padding:0 48px 72px;column-count:3;column-gap:24px}
+  .shot{break-inside:avoid;margin-bottom:24px;position:relative;overflow:hidden;border-radius:2px;cursor:pointer;background:#eceae5;opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1)}
+  .shot.in{opacity:1;transform:none}
+  .shot img{width:100%;transition:transform .8s cubic-bezier(.22,1,.36,1)}
+  .shot:hover img{transform:scale(1.045)}
+  .shot figcaption{position:absolute;left:0;right:0;bottom:0;padding:30px 20px 16px;background:linear-gradient(to top,rgba(20,18,15,.66),transparent);color:#fff;opacity:0;transform:translateY(8px);transition:.4s;pointer-events:none}
+  .shot:hover figcaption{opacity:1;transform:none}
+  .shot figcaption .t{font-family:'Playfair Display',serif;font-size:19px;font-weight:500}
+  .shot figcaption .m{font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.85;margin-top:2px}
+  .shot .tools{position:absolute;top:10px;right:10px;display:none;gap:6px;z-index:2}
+  body.editing .shot:hover .tools{display:flex}
+  .shot .tools button{width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+  .shot .tools button:hover{background:#fff}
+  body.editing .shot{cursor:default}
+
+  /* empty state */
+  .empty{max-width:560px;margin:40px auto 90px;text-align:center;padding:0 24px}
+  .empty .ic{width:64px;height:64px;margin:0 auto 22px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-soft)}
+  .empty h3{font-family:'Playfair Display',serif;font-weight:500;font-size:26px;margin-bottom:12px}
+  .empty p{color:var(--ink-soft);font-size:15px;font-weight:300;margin-bottom:26px}
+
+  /* ---------- about ---------- */
+  .about{border-top:1px solid var(--line-soft);background:var(--surface)}
+  .about-inner{max-width:760px;margin:0 auto;padding:92px 48px;text-align:center}
+  .about .eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:28px}
+  .about h2{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(24px,3.2vw,38px);line-height:1.34}
+
+  /* ---------- footer ---------- */
+  footer{background:var(--bg);padding:64px 48px;text-align:center;border-top:1px solid var(--line-soft)}
+  footer .eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:20px}
+  footer .big{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(28px,5vw,52px);font-weight:400}
+  footer .big a{color:var(--ink);text-decoration:none}
+  footer .big a:hover{color:var(--ink-soft)}
+  .social{margin-top:32px;display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+  .social a{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);text-decoration:none;transition:.25s}
+  .social a:hover{color:var(--ink)}
+  .copyright{margin-top:44px;font-size:11px;letter-spacing:.1em;color:var(--ink-soft);text-transform:uppercase}
+
+  /* ---------- lightbox ---------- */
+  .lb{position:fixed;inset:0;z-index:100;background:rgba(20,18,15,.95);display:none;align-items:center;justify-content:center;padding:40px}
+  .lb.open{display:flex}
+  .lb figure{max-width:92vw;max-height:90vh;display:flex;flex-direction:column;align-items:center}
+  .lb img{max-width:90vw;max-height:80vh;object-fit:contain;border-radius:2px}
+  .lb .cap{color:#fff;text-align:center;margin-top:18px}
+  .lb .cap .t{font-family:'Playfair Display',serif;font-size:20px}
+  .lb .cap .m{font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.7;margin-top:4px}
+  .lb .x{position:absolute;top:24px;right:32px;font-size:30px;color:#fff;background:none;border:0;cursor:pointer;line-height:1}
+  .lb .nav-a{position:absolute;top:50%;transform:translateY(-50%);font-size:42px;color:rgba(255,255,255,.7);background:none;border:0;cursor:pointer;padding:18px}
+  .lb .prev{left:6px}.lb .next{right:6px}.lb .nav-a:hover{color:#fff}
+
+  /* ---------- modal ---------- */
+  .modal{position:fixed;inset:0;z-index:90;background:rgba(20,18,15,.5);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+  .modal.open{display:flex}
+  .sheet{background:var(--surface);border-radius:4px;max-width:560px;width:100%;padding:38px;margin:auto}
+  .sheet h2{font-family:'Playfair Display',serif;font-weight:500;font-size:26px;margin-bottom:6px}
+  .sheet .sub{font-size:13px;color:var(--ink-soft);margin-bottom:26px}
+  .field{margin-bottom:18px}
+  .field label{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px}
+  .field input,.field textarea,.field select{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--ink)}
+  .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--ink)}
+  .field textarea{resize:vertical;min-height:80px;line-height:1.6}
+  .field.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .drop{border:1.5px dashed var(--line);border-radius:6px;padding:30px 20px;text-align:center;cursor:pointer;transition:.2s;color:var(--ink-soft);font-size:13px}
+  .drop:hover,.drop.over{border-color:var(--ink);color:var(--ink);background:var(--bg)}
+  .preview-img{margin-top:12px;border-radius:4px;overflow:hidden;max-height:200px;display:none}
+  .preview-img img{width:100%;height:100%;object-fit:contain;max-height:200px}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:30px}
+  .btn{padding:11px 22px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);transition:.2s}
+  .btn:hover{border-color:var(--ink)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.danger{color:#b3261e;border-color:#e7c4c1}
+  .btn.danger:hover{background:#fcf0ef}
+  .divider{border:0;border-top:1px solid var(--line-soft);margin:24px 0}
+  .row-links{display:flex;flex-direction:column;gap:14px}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:13px 24px;border-radius:8px;font-size:14px;z-index:200;opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}.shot{opacity:1;transform:none}}
+  @media(max-width:900px){.hero{grid-template-columns:1fr;text-align:center;padding-top:52px}.hero p{margin-left:auto;margin-right:auto}.hero-img{max-width:360px;margin:0 auto}.gallery{column-count:2}}
+  @media(max-width:560px){
+    header{padding:16px 22px}nav ul{display:none}.menu-btn{display:block}
+    .hero,.filters,.gallery,#editorbar{padding-left:22px;padding-right:22px}
+    .gallery{column-count:1}.about-inner,footer{padding-left:24px;padding-right:24px}
+    .sheet{padding:26px}.field.two{grid-template-columns:1fr}
+    .ebar-hint{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- embedded data block: empty on the master file; filled when you export a shareable site -->
+<script id="portfolio-data" type="application/json">null</script>
+
+<header>
+  <button class="brand" id="brand" onclick="document.getElementById('top').scrollIntoView()">Studio</button>
+  <nav><ul>
+    <li><a href="#work">作品</a></li>
+    <li><a href="#about">關於</a></li>
+    <li><a href="#contact">聯絡</a></li>
+  </ul></nav>
+  <div class="nav-right">
+    <button class="edit-toggle" id="editToggle">編輯</button>
+    <button class="menu-btn" id="menuBtn" aria-label="選單">☰</button>
+  </div>
+</header>
+
+<div id="top"></div>
+
+<div id="editorbar">
+  <button class="ebtn primary" id="addBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新增作品</button>
+  <button class="ebtn" id="settingsBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15H4.5a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 6 8.6l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 11 4.6V4.5a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 11h.1a2 2 0 0 1 0 4h-.1z"/></svg>網站設定</button>
+  <button class="ebtn" id="shareBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>匯出可分享網頁</button>
+  <button class="ebtn" id="exportJson">匯出資料</button>
+  <button class="ebtn" id="importBtn">匯入資料</button>
+  <span class="ebar-hint">編輯只存在本機；要分享給別人請按「匯出可分享網頁」</span>
+</div>
+
+<section class="hero" id="hero"></section>
+
+<div class="filters" id="filters"></div>
+
+<section class="gallery" id="gallery" data-section="work"></section>
+<div class="empty" id="empty" style="display:none"></div>
+
+<section class="about" id="about"></section>
+
+<footer id="contact"></footer>
+
+<!-- lightbox -->
+<div class="lb" id="lb">
+  <button class="x" id="lbx" aria-label="關閉">×</button>
+  <button class="nav-a prev" id="lbp" aria-label="上一張">‹</button>
+  <figure><img id="lbi" src="" alt=""><figcaption class="cap"><div class="t" id="lbt"></div><div class="m" id="lbm"></div></figcaption></figure>
+  <button class="nav-a next" id="lbn" aria-label="下一張">›</button>
+</div>
+
+<!-- photo modal -->
+<div class="modal" id="photoModal">
+  <div class="sheet">
+    <h2 id="pmTitle">新增作品</h2>
+    <p class="sub">上傳照片並填寫資訊，留白的欄位不會顯示。</p>
+    <div class="field">
+      <label>照片</label>
+      <div class="drop" id="drop">點此選擇或拖曳照片到這裡<br><span style="font-size:11px;opacity:.7">大圖會自動壓縮以利儲存</span></div>
+      <input type="file" id="fileInput" accept="image/*" hidden>
+      <div class="field" style="margin:12px 0 0">
+        <label>或貼上圖片網址</label>
+        <input type="url" id="pmUrl" placeholder="https://...">
+      </div>
+      <div class="preview-img" id="pmPreview"><img id="pmPreviewImg" src="" alt=""></div>
+    </div>
+    <div class="field"><label>標題</label><input type="text" id="pmName" placeholder="作品名稱"></div>
+    <div class="field two">
+      <div><label>分類</label><select id="pmCat"></select></div>
+      <div><label>年份</label><input type="text" id="pmYear" placeholder="2026"></div>
+    </div>
+    <div class="field"><label>說明（選填）</label><textarea id="pmDesc" placeholder="拍攝故事、地點、器材…"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn danger" id="pmDelete" style="display:none;margin-right:auto">刪除</button>
+      <button class="btn" id="pmCancel">取消</button>
+      <button class="btn primary" id="pmSave">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- settings modal -->
+<div class="modal" id="settingsModal">
+  <div class="sheet">
+    <h2>網站設定</h2>
+    <p class="sub">這些文字會顯示在首頁、關於與頁尾。</p>
+    <div class="field"><label>網站／品牌名稱（導覽列、頁尾）</label><input type="text" id="sBrand" placeholder="Yang Studio"></div>
+    <div class="field"><label>首頁小標（職稱・地點）</label><input type="text" id="sEyebrow" placeholder="Photographer · Taipei"></div>
+    <div class="field"><label>首頁大標（可換行）</label><textarea id="sTitle" placeholder="捕捉光影裡&#10;的靜謐瞬間"></textarea></div>
+    <div class="field"><label>首頁說明</label><textarea id="sIntro"></textarea></div>
+    <div class="field">
+      <label>首頁封面圖（選填）</label>
+      <div class="drop" id="heroDrop">點此選擇封面照片（留白則首頁置中無圖）</div>
+      <input type="file" id="heroFile" accept="image/*" hidden>
+      <div class="preview-img" id="heroPrev"><img id="heroPrevImg" src="" alt=""></div>
+      <button class="btn" id="heroClear" style="margin-top:10px;display:none">移除封面圖</button>
+    </div>
+    <hr class="divider">
+    <div class="field"><label>關於 — 小標</label><input type="text" id="sAboutEyebrow" placeholder="About"></div>
+    <div class="field"><label>關於 — 內文</label><textarea id="sAbout"></textarea></div>
+    <hr class="divider">
+    <div class="field"><label>聯絡 Email</label><input type="email" id="sEmail" placeholder="hello@example.com"></div>
+    <div class="row-links">
+      <div class="field two" style="margin:0">
+        <div><label>Instagram 網址</label><input type="url" id="sIg" placeholder="https://instagram.com/..."></div>
+        <div><label>Behance 網址</label><input type="url" id="sBe" placeholder="https://behance.net/..."></div>
+      </div>
+      <div class="field" style="margin:0"><label>其他連結（個人網站／500px…）</label><input type="url" id="sOther" placeholder="https://..."></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="setCancel">取消</button>
+      <button class="btn primary" id="setSave">儲存設定</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="importFile" accept="application/json" hidden>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ defaults & state ============ */
+const LS_KEY='photo_portfolio_v1';
+const DEFAULT_CATS=['人像','風景','街拍','靜物','建築','旅行'];
+const DEFAULTS={
+  published:false,
+  settings:{
+    brand:'Studio', eyebrow:'Photographer · Taipei',
+    title:'捕捉光影裡\n的靜謐瞬間',
+    intro:'以自然光與細膩構圖記錄人、地方與時間的痕跡。每一幀都是一段安靜而誠實的敘事。',
+    heroImage:'',
+    aboutEyebrow:'About',
+    about:'我相信最好的照片是等待而非製造出來的，於是我學會了凝視與等待。',
+    email:'hello@example.com', ig:'', be:'', other:''
+  },
+  categories:[...DEFAULT_CATS],
+  photos:[]
+};
+
+let state, activeFilter='all', editing=false, editId=null, pendingImg='', heroPendingImg=null;
+
+function loadState(){
+  const saved=localStorage.getItem(LS_KEY);
+  if(saved){try{return JSON.parse(saved)}catch(e){}}
+  const embedded=JSON.parse(document.getElementById('portfolio-data').textContent||'null');
+  if(embedded && embedded.photos) return embedded;   // seed fresh visitors from baked-in data
+  return structuredClone(DEFAULTS);
+}
+function save(){ localStorage.setItem(LS_KEY,JSON.stringify(state)); }
+function isOwner(){ return location.protocol==='file:' || /edit/i.test(location.hash); }
+
+/* ============ helpers ============ */
+const $=id=>document.getElementById(id);
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function fileToDataURL(file,maxDim=1600,quality=0.85){
+  return new Promise((res,rej)=>{
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{let{width:w,height:h}=img;if(Math.max(w,h)>maxDim){const r=maxDim/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}
+      const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',quality));};
+    img.onerror=rej;img.src=url;});
+}
+
+/* ============ render ============ */
+function render(){
+  const s=state.settings;
+  document.title=s.brand?`${s.brand} · 攝影作品集`:'攝影作品集';
+  $('brand').textContent=s.brand||'Studio';
+
+  // hero
+  const hero=$('hero');
+  hero.className='hero'+(s.heroImage?'':' no-img');
+  hero.innerHTML=`<div>
+      ${s.eyebrow?`<p class="eyebrow">${esc(s.eyebrow)}</p>`:''}
+      <h1 class="serif">${esc(s.title).replace(/\n/g,'<br>')}</h1>
+      ${s.intro?`<p>${esc(s.intro)}</p>`:''}
+    </div>
+    ${s.heroImage?`<div class="hero-img"><img src="${s.heroImage}" alt="封面"></div>`:''}`;
+
+  // filters
+  const cats=state.categories.filter(c=>state.photos.some(p=>p.category===c));
+  $('filters').innerHTML=[`<button class="chip ${activeFilter==='all'?'active':''}" data-f="all">全部</button>`]
+    .concat(cats.map(c=>`<button class="chip ${activeFilter===c?'active':''}" data-f="${esc(c)}">${esc(c)}</button>`)).join('');
+  $('filters').style.display=state.photos.length?'flex':'none';
+
+  // gallery
+  const list=state.photos.filter(p=>activeFilter==='all'||p.category===activeFilter);
+  const g=$('gallery');
+  g.innerHTML=list.map(p=>{
+    const meta=[p.category,p.year].filter(Boolean).join(' · ');
+    return `<figure class="shot" data-id="${p.id}">
+      <img src="${p.src}" alt="${esc(p.name||'作品')}" loading="lazy">
+      ${(p.name||meta)?`<figcaption>${p.name?`<div class="t">${esc(p.name)}</div>`:''}${meta?`<div class="m">${esc(meta)}</div>`:''}</figcaption>`:''}
+      <div class="tools"><button data-act="edit" title="編輯">✎</button><button data-act="del" title="刪除">✕</button></div>
+    </figure>`;}).join('');
+
+  // empty state
+  $('empty').style.display=state.photos.length?'none':'block';
+  if(!state.photos.length){
+    $('empty').innerHTML=`<div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+      <h3 class="serif">${editing?'開始建立你的作品集':'作品即將上架'}</h3>
+      <p>${editing?'點擊上方「新增作品」上傳你的第一張照片。':(document.body.classList.contains('owner')?'按右上角「編輯」即可開始新增照片。':'作品即將上架，敬請期待。')}</p>
+      ${editing?'<button class="btn primary" onclick="openPhoto()">＋ 新增第一張作品</button>':''}`;
+  }
+
+  // about
+  $('about').innerHTML=s.about?`<div class="about-inner">
+      ${s.aboutEyebrow?`<p class="eyebrow">${esc(s.aboutEyebrow)}</p>`:''}
+      <h2 class="serif">${esc(s.about).replace(/\n/g,'<br>')}</h2></div>`:'';
+
+  // footer
+  const socials=[['Instagram',s.ig],['Behance',s.be],['網站',s.other]].filter(x=>x[1]);
+  $('contact').innerHTML=`<p class="eyebrow">Let's work together</p>
+    ${s.email?`<div class="big serif"><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></div>`:''}
+    ${socials.length?`<div class="social">${socials.map(x=>`<a href="${esc(x[1])}" target="_blank" rel="noopener">${x[0]}</a>`).join('')}</div>`:''}
+    <div class="copyright">© ${new Date().getFullYear()} ${esc(s.brand||'')} · All rights reserved</div>`;
+
+  revealObserve();
+}
+
+/* scroll reveal */
+let io;
+function revealObserve(){
+  if(io)io.disconnect();
+  io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.08});
+  document.querySelectorAll('.shot').forEach(el=>io.observe(el));
+}
+
+/* ============ lightbox ============ */
+let lbList=[],lbIdx=0;
+function openLB(id){
+  lbList=state.photos.filter(p=>activeFilter==='all'||p.category===activeFilter);
+  lbIdx=lbList.findIndex(p=>p.id===id);showLB();$('lb').classList.add('open');
+}
+function showLB(){const p=lbList[lbIdx];if(!p)return;$('lbi').src=p.src;$('lbt').textContent=p.name||'';
+  $('lbm').textContent=[p.category,p.year].filter(Boolean).join(' · ');}
+function stepLB(d){lbIdx=(lbIdx+d+lbList.length)%lbList.length;showLB();}
+
+/* ============ photo modal ============ */
+function fillCats(sel){
+  $('pmCat').innerHTML='<option value="">請選擇</option>'+state.categories.map(c=>`<option ${c===sel?'selected':''}>${esc(c)}</option>`).join('')+'<option value="__new">＋ 自訂分類…</option>';
+}
+function openPhoto(id){
+  editId=id||null;pendingImg='';
+  const p=id?state.photos.find(x=>x.id===id):null;
+  $('pmTitle').textContent=id?'編輯作品':'新增作品';
+  $('pmDelete').style.display=id?'block':'none';
+  fillCats(p?p.category:'');
+  $('pmName').value=p?p.name||'':'';
+  $('pmYear').value=p?p.year||'':'';
+  $('pmDesc').value=p?p.desc||'':'';
+  $('pmUrl').value=p&&p.src&&!p.src.startsWith('data:')?p.src:'';
+  pendingImg=p?p.src:'';
+  showPreview(pendingImg);
+  $('photoModal').classList.add('open');
+}
+function showPreview(src){const w=$('pmPreview');if(src){$('pmPreviewImg').src=src;w.style.display='block';}else w.style.display='none';}
+async function savePhoto(){
+  let src=pendingImg;
+  const url=$('pmUrl').value.trim();
+  if(url && url!==src && !src.startsWith('data:')) src=url;
+  if(!src){toast('請先選擇照片或貼上圖片網址');return;}
+  let cat=$('pmCat').value;
+  if(cat==='__new'){const n=prompt('輸入新分類名稱');if(!n)return;cat=n.trim();if(!state.categories.includes(cat))state.categories.push(cat);}
+  const data={name:$('pmName').value.trim(),category:cat,year:$('pmYear').value.trim(),desc:$('pmDesc').value.trim(),src};
+  if(editId){Object.assign(state.photos.find(p=>p.id===editId),data);}
+  else{state.photos.unshift({id:Date.now().toString(),createdAt:Date.now(),...data});}
+  save();render();$('photoModal').classList.remove('open');toast(editId?'已更新':'已新增作品');
+}
+function delPhoto(){if(!editId)return;if(!confirm('確定刪除這張作品？'))return;
+  state.photos=state.photos.filter(p=>p.id!==editId);save();render();$('photoModal').classList.remove('open');toast('已刪除');}
+
+/* ============ settings modal ============ */
+function openSettings(){
+  const s=state.settings;heroPendingImg=null;
+  $('sBrand').value=s.brand||'';$('sEyebrow').value=s.eyebrow||'';$('sTitle').value=s.title||'';
+  $('sIntro').value=s.intro||'';$('sAboutEyebrow').value=s.aboutEyebrow||'';$('sAbout').value=s.about||'';
+  $('sEmail').value=s.email||'';$('sIg').value=s.ig||'';$('sBe').value=s.be||'';$('sOther').value=s.other||'';
+  const hp=$('heroPrev');if(s.heroImage){$('heroPrevImg').src=s.heroImage;hp.style.display='block';$('heroClear').style.display='inline-block';}
+  else{hp.style.display='none';$('heroClear').style.display='none';}
+  $('settingsModal').classList.add('open');
+}
+function saveSettings(){
+  const s=state.settings;
+  s.brand=$('sBrand').value.trim();s.eyebrow=$('sEyebrow').value.trim();s.title=$('sTitle').value;
+  s.intro=$('sIntro').value.trim();s.aboutEyebrow=$('sAboutEyebrow').value.trim();s.about=$('sAbout').value;
+  s.email=$('sEmail').value.trim();s.ig=$('sIg').value.trim();s.be=$('sBe').value.trim();s.other=$('sOther').value.trim();
+  if(heroPendingImg!==null)s.heroImage=heroPendingImg;
+  save();render();$('settingsModal').classList.remove('open');toast('設定已儲存');
+}
+
+/* ============ export shareable HTML ============ */
+function exportSite(){
+  const clone=document.documentElement.cloneNode(true);
+  // reset transient DOM so the shared file boots clean
+  clone.querySelector('#gallery').innerHTML='';
+  clone.querySelector('#hero').innerHTML='';
+  clone.querySelector('#about').innerHTML='';
+  clone.querySelector('#contact').innerHTML='';
+  clone.querySelector('#filters').innerHTML='';
+  clone.querySelectorAll('.modal,.lb').forEach(m=>m.classList.remove('open'));
+  clone.querySelector('body').classList.remove('editing','owner');
+  clone.querySelector('#portfolio-data').textContent=JSON.stringify(state).replace(/</g,'\\u003c');
+  const html='<!DOCTYPE html>\n'+clone.outerHTML;
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='portfolio.html';a.click();URL.revokeObjectURL(a.href);
+  toast('已匯出 portfolio.html — 可直接寄出或上傳 GitHub Pages');
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='portfolio-data.json';a.click();URL.revokeObjectURL(a.href);
+}
+function importJSON(file){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);
+  if(!d.settings||!Array.isArray(d.photos))throw 0;d.published=false;state=d;save();render();toast('已匯入資料');}
+  catch(e){toast('檔案格式不正確');}};r.readAsText(file);}
+
+/* ============ events ============ */
+function bind(){
+  $('editToggle').onclick=()=>{editing=!editing;document.body.classList.toggle('editing',editing);render();};
+  $('menuBtn').onclick=()=>{const n=document.querySelector('nav ul');n.style.display=n.style.display==='flex'?'':'flex';
+    n.style.cssText=n.style.display==='flex'?'display:flex;position:absolute;top:60px;right:22px;background:#fff;flex-direction:column;padding:16px 22px;border:1px solid var(--line);border-radius:8px;gap:14px':'';};
+  $('addBtn').onclick=()=>openPhoto();
+  $('settingsBtn').onclick=openSettings;
+  $('shareBtn').onclick=exportSite;
+  $('exportJson').onclick=exportJSON;
+  $('importBtn').onclick=()=>$('importFile').click();
+  $('importFile').onchange=e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value='';};
+
+  // filters / gallery delegation
+  $('filters').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;activeFilter=b.dataset.f;render();};
+  $('gallery').onclick=e=>{
+    const tool=e.target.closest('.tools button');const fig=e.target.closest('.shot');if(!fig)return;
+    if(tool){const id=fig.dataset.id;tool.dataset.act==='edit'?openPhoto(id):(editId=id,delPhoto());return;}
+    if(!editing)openLB(fig.dataset.id);
+  };
+
+  // photo modal
+  $('pmCancel').onclick=()=>$('photoModal').classList.remove('open');
+  $('pmSave').onclick=savePhoto;
+  $('pmDelete').onclick=delPhoto;
+  $('pmCat').onchange=e=>{if(e.target.value==='__new'){const n=prompt('輸入新分類名稱');if(n){const v=n.trim();if(!state.categories.includes(v))state.categories.push(v);fillCats(v);}else e.target.value='';}};
+  const drop=$('drop'),fi=$('fileInput');
+  drop.onclick=()=>fi.click();
+  fi.onchange=async e=>{if(e.target.files[0]){pendingImg=await fileToDataURL(e.target.files[0]);$('pmUrl').value='';showPreview(pendingImg);}};
+  ;['dragover','dragleave','drop'].forEach(ev=>drop.addEventListener(ev,async e=>{e.preventDefault();
+    if(ev==='dragover')drop.classList.add('over');else drop.classList.remove('over');
+    if(ev==='drop'&&e.dataTransfer.files[0]){pendingImg=await fileToDataURL(e.dataTransfer.files[0]);$('pmUrl').value='';showPreview(pendingImg);}}));
+  $('pmUrl').oninput=e=>{const v=e.target.value.trim();if(v){pendingImg=v;showPreview(v);}};
+
+  // settings modal
+  $('setCancel').onclick=()=>$('settingsModal').classList.remove('open');
+  $('setSave').onclick=saveSettings;
+  const hd=$('heroDrop'),hf=$('heroFile');
+  hd.onclick=()=>hf.click();
+  hf.onchange=async e=>{if(e.target.files[0]){heroPendingImg=await fileToDataURL(e.target.files[0],2000,.88);$('heroPrevImg').src=heroPendingImg;$('heroPrev').style.display='block';$('heroClear').style.display='inline-block';}};
+  $('heroClear').onclick=()=>{heroPendingImg='';$('heroPrev').style.display='none';$('heroClear').style.display='none';};
+
+  // lightbox
+  $('lbx').onclick=()=>$('lb').classList.remove('open');
+  $('lbp').onclick=e=>{e.stopPropagation();stepLB(-1);};
+  $('lbn').onclick=e=>{e.stopPropagation();stepLB(1);};
+  $('lb').onclick=e=>{if(e.target===$('lb'))$('lb').classList.remove('open');};
+  document.addEventListener('keydown',e=>{
+    if($('lb').classList.contains('open')){if(e.key==='Escape')$('lb').classList.remove('open');if(e.key==='ArrowLeft')stepLB(-1);if(e.key==='ArrowRight')stepLB(1);}
+    if(e.key==='Escape')document.querySelectorAll('.modal.open').forEach(m=>m.classList.remove('open'));
+  });
+}
+
+/* ============ init ============ */
+state=loadState();
+if(isOwner())document.body.classList.add('owner');
+bind();
+render();
+</script>
+</body>
+</html>
