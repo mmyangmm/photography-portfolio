@@ -1,4 +1,4 @@
 .DS_Store
 samples/
-*.json
-!firebase.json
+# 匯出的資料快照（實際資料已嵌入 index.html，不需進版控）
+portfolio-data*.json
